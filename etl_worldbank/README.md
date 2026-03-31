@@ -222,14 +222,22 @@ ORDER BY c.name, f.year;
 | United States  | 2024 | 66356.1707 |
 | United States  | 2025 | NULL       |
 
-*Observação:* os valores correspondem ao PIB per capita (USD constante de 2015). Para o ano de 2025, os dados ainda não estão disponíveis na API, resultando em NULL.
+*Observação:* os valores correspondem ao PIB per capita (USD constante de 2015). Para o ano de 2025, os dados ainda não estão disponíveis na API, resultando assim em NULL.
 
 ### Query 5 – Idempotência (reexecução)
 ```sql
 -- Antes da segunda execução
 SELECT COUNT(*) FROM wdi_facts;  -- resultado: 13760
+
+| count |
+|-------\
+| 13760 |
 -- Após reexecutar o pipeline
 SELECT COUNT(*) FROM wdi_facts;  -- resultado: 13760 (mesmo número)
+
+| count |
+|-------\
+| 13760 |
 ```
 O número total de registros permaneceu inalterado, comprovando que o upsert está funcionando corretamente.
 
