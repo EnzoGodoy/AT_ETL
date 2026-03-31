@@ -15,13 +15,20 @@ def transform_countries(raw_countries):
     
     for c in raw_countries:
         # T1: real country filter
-        iso2 = c.get("id", "")
+        iso2 = (c.get("iso2Code") or "").strip()
         if len(iso2) != 2:
             continue
-        
-        # Income group filter: must be LIC, MIC, HIC
-        income_group = c.get("incomeLevel", {}).get("id", "")
-        if income_group not in ["LIC", "MIC", "HIC"]:
+
+        # Income group filter: normalize lower/upper middle income to MIC
+        income_raw = (c.get("incomeLevel", {}).get("id") or "").strip()
+        income_group = {
+            "LIC": "LIC",
+            "LMC": "MIC",
+            "UMC": "MIC",
+            "MIC": "MIC",
+            "HIC": "HIC",
+        }.get(income_raw)
+        if not income_group:
             continue
         
         # T2: strip strings, replace empty with None

@@ -1,5 +1,5 @@
 import logging
-from sqlalchemy import create_engine, MetaData, Table, Column, String, Numeric, SmallInteger, TIMESTAMP, text
+from sqlalchemy import create_engine, MetaData, Table, Column, String, Text, Numeric, SmallInteger, TIMESTAMP, text
 from sqlalchemy.dialects.postgresql import insert
 from src.config import Config
 
@@ -27,7 +27,7 @@ countries_table = Table(
 indicators_table = Table(
     "indicators", metadata,
     Column("indicator_code", String(40), primary_key=True),
-    Column("indicator_name", text, nullable=False),
+    Column("indicator_name", Text, nullable=False),
     Column("unit", String(30)),
 )
 
@@ -42,6 +42,10 @@ wdi_facts_table = Table(
 
 def load_countries(conn, countries_list):
     """Upsert countries using on_conflict_do_update."""
+    if not countries_list:
+        logger.warning("No countries to load; skipping upsert.")
+        return
+
     stmt = insert(countries_table).values(countries_list)
     stmt = stmt.on_conflict_do_update(
         index_elements=["iso2_code"],
@@ -61,6 +65,10 @@ def load_countries(conn, countries_list):
 
 def load_indicators(conn, indicators_list):
     """Upsert indicators."""
+    if not indicators_list:
+        logger.warning("No indicators to load; skipping upsert.")
+        return
+
     stmt = insert(indicators_table).values(indicators_list)
     stmt = stmt.on_conflict_do_update(
         index_elements=["indicator_code"],
